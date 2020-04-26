@@ -215,12 +215,10 @@ export default () => {
               transform: interpolate([x], (x) => `translate(${x})`),
             }}
           >
-            <ResultsList.Item.Body data-url="www.google.com">
-              <h4>
-                {rumors.claims.length
-                  ? `Claim by ${rumors.claims[index].claimant}:`
-                  : "Loading..."}
-              </h4>
+            <ResultsList.Item.Body
+              data-url={rumors.claims[index].claimReview[0].url}
+            >
+              <h4>Claim by {rumors.claims[index].claimant}:</h4>
               <p>{rumors.claims[index].text}</p>
               <p>
                 <strong>{`${rumors.claims[index].claimReview[0].publisher.name}`}</strong>{" "}
@@ -236,29 +234,6 @@ export default () => {
             <CopyButton onClick={handleCopy}>Copy Link</CopyButton>
           </ResultsList.Item>
         ))}
-        {/* {rumors.claims.length
-          ? rumors.claims.map((rumor) => (
-              <ResultsList.Item key={rumors.claims.indexOf(rumor)}>
-                <ResultsList.Item.Body data-url={rumor.claimReview[0].url}>
-                  <h4>
-                    {rumor.claimant ? `Claim by ${rumor.claimant}:` : "Claim:"}
-                  </h4>
-                  <p>{rumor.text}</p>
-                  <p>
-                    <strong>{`${rumor.claimReview[0].publisher.name}`}</strong>{" "}
-                    rating:{" "}
-                    <strong>{`${rumor.claimReview[0].textualRating}`}</strong>
-                  </p>
-                  <small>
-                    <a href={rumor.claimReview[0].url}>
-                      {rumor.claimReview[0].title}
-                    </a>
-                  </small>
-                </ResultsList.Item.Body>
-                <CopyButton onClick={handleCopy}>Copy Link</CopyButton>
-              </ResultsList.Item>
-            ))
-          : null} */}
       </ResultsList>
     </Container>
   );
