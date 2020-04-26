@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import axios from "axios";
+import { animated, useTrail, interpolate } from "react-spring";
 import background from "../images/bg-shorten-desktop.svg";
 
 const Container = styled.div`
@@ -63,7 +64,7 @@ const SubmitButton = styled.button`
   font-size: 1.125rem;
   border: none;
   border-radius: 0.5rem;
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
   width: 100%;
   padding: 1rem;
   &:hover {
@@ -74,11 +75,12 @@ const SubmitButton = styled.button`
   }
 `;
 
-const ResultsList = styled.div`
+const ResultsList = styled(animated.div)`
   margin: 2rem 0;
+  overflow: hidden;
 `;
 
-ResultsList.Item = styled.div`
+ResultsList.Item = styled(animated.div)`
   display: flex;
   flex-direction: column;
   margin-bottom: 2rem;
@@ -133,6 +135,7 @@ const CopyButton = styled.a`
 const Error = styled.p`
   color: ${({ theme }) => theme.red};
   font-style: italic;
+  padding: 0.5rem;
   @media (min-width: 768px) {
     position: absolute;
   }
@@ -140,24 +143,16 @@ const Error = styled.p`
 
 export default () => {
   const [rumors, setRumors] = useState({ claims: [] });
-  const [query, setQuery] = useState("Covid-19");
+  const [query, setQuery] = useState("");
   const [hasErrors, setHasErrors] = useState(false);
-  useEffect(() => {
-    const getRumors = async () => {
-      const results = await axios(
-        `https://factchecktools.googleapis.com/v1alpha1/claims:search?query=${query}&key=${process.env.REACT_APP_API_KEY}&languageCode=en-US`
-      );
-      setRumors({ claims: results.data.claims });
-    };
-    getRumors();
-  }, []);
+  const trail = useTrail(rumors.claims.length, {
+    x: "0%",
+    from: { x: "300%" },
+  });
   const handleChange = (e) => {
     setQuery(e.target.value);
   };
-  // const saveToLocalStorage = (rumors) => {
-  //   const serializedUrls = JSON.stringify(rumors.claims);
-  //   localStorage.setItem("rumors", serializedUrls);
-  // };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const getRumors = async () => {
@@ -196,15 +191,52 @@ export default () => {
               id="queryForm"
             />
             {hasErrors ? (
-              <Error>Invalid search. Please try again.</Error>
+              <Error>
+                Sorry, couldn't find anything. Please try another search term.
+              </Error>
             ) : null}
           </ValidatedFieldset>
-          <SubmitButton onClick={handleSubmit}>Debunk It!</SubmitButton>
+          <SubmitButton
+            onClick={handleSubmit}
+            disabled={query !== "" ? false : true}
+          >
+            Debunk It!
+          </SubmitButton>
         </FactChecker.Form>
       </FactChecker>
-      <h3>Showing results for {query}</h3>
+      <h3>{rumors.claims.length ? `Showing results for ${query} ` : null}</h3>
       <ResultsList>
-        {rumors.claims.length
+        {trail.map(({ x, ...props }, index) => (
+          <ResultsList.Item
+            key={index}
+            style={{
+              ...props,
+              x,
+              transform: interpolate([x], (x) => `translate(${x})`),
+            }}
+          >
+            <ResultsList.Item.Body data-url="www.google.com">
+              <h4>
+                {rumors.claims.length
+                  ? `Claim by ${rumors.claims[index].claimant}:`
+                  : "Loading..."}
+              </h4>
+              <p>{rumors.claims[index].text}</p>
+              <p>
+                <strong>{`${rumors.claims[index].claimReview[0].publisher.name}`}</strong>{" "}
+                rating:{" "}
+                <strong>{`${rumors.claims[index].claimReview[0].textualRating}`}</strong>
+              </p>
+              <small>
+                <a href={rumors.claims[index].claimReview[0].url}>
+                  {rumors.claims[index].claimReview[0].title}
+                </a>
+              </small>
+            </ResultsList.Item.Body>
+            <CopyButton onClick={handleCopy}>Copy Link</CopyButton>
+          </ResultsList.Item>
+        ))}
+        {/* {rumors.claims.length
           ? rumors.claims.map((rumor) => (
               <ResultsList.Item key={rumors.claims.indexOf(rumor)}>
                 <ResultsList.Item.Body data-url={rumor.claimReview[0].url}>
@@ -226,7 +258,7 @@ export default () => {
                 <CopyButton onClick={handleCopy}>Copy Link</CopyButton>
               </ResultsList.Item>
             ))
-          : null}
+          : null} */}
       </ResultsList>
     </Container>
   );

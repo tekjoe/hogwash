@@ -108,13 +108,17 @@ export default () => {
         <div>
           <h4>
             Built by{" "}
-            <a href="tekjoe.dev/" target="_blank">
+            <a
+              href="http://www.tekjoe.dev/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               tekjoe
             </a>
           </h4>
           <p>
             I'm always looking for my next project. If you want to build
-            something together, get in touch with contact me on social media.
+            something together, connect with me on social media.
           </p>
         </div>
         <div>
