@@ -218,7 +218,11 @@ export default () => {
             <ResultsList.Item.Body
               data-url={rumors.claims[index].claimReview[0].url}
             >
-              <h4>Claim by {rumors.claims[index].claimant}:</h4>
+              <h4>
+                {rumors.claims[index].claimant
+                  ? `Claim by ${rumors.claims[index].claimant}:`
+                  : "Claim:"}
+              </h4>
               <p>{rumors.claims[index].text}</p>
               <p>
                 <strong>{`${rumors.claims[index].claimReview[0].publisher.name}`}</strong>{" "}
