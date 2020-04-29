@@ -38,6 +38,10 @@ const MobileNav = styled(motion.nav)`
     }
     li {
       padding: 0.75rem 0;
+      a {
+        color: white;
+        text-decoration: none;
+      }
     }
   }
 `;
@@ -84,6 +88,7 @@ const Button = styled.a`
   width: 100%;
   border-radius: 2rem;
   cursor: pointer;
+  text-decoration: none;
   &:hover {
     background: ${({ theme }) => theme.lighterCyan};
   }
@@ -120,12 +125,16 @@ export default () => {
           <DesktopNav>
             <DesktopNav.Navigation>
               <li>
-                <a href="#memetics">Search</a>
+                <a href="#debunker">Search</a>
+              </li>
+              <li>
+                <a href="#memetics">Features</a>
               </li>
             </DesktopNav.Navigation>
             <DesktopNav.Authentication>
-              <p>Login</p>
-              <Button>Sign Up</Button>
+              <Button href="https://www.facebook.com/sharer/sharer.php?u=https://hogwash.netlify.app/">
+                Share It!
+              </Button>
             </DesktopNav.Authentication>
           </DesktopNav>
         </Navbar>
@@ -136,14 +145,21 @@ export default () => {
           initial={false}
         >
           <ul>
-            <li>Features</li>
-            <li>Pricing</li>
-            <li>Resources</li>
+            <li>
+              <a href="#debunker" onClick={toggleMenu}>
+                Search
+              </a>
+            </li>
+            <li>
+              <a href="#memetics" onClick={toggleMenu}>
+                Features
+              </a>
+            </li>
           </ul>
-          <ul>
-            <li>Login</li>
-          </ul>
-          <Button>Sign Up</Button>
+          <ul></ul>
+          <Button href="https://www.facebook.com/sharer/sharer.php?u=https://hogwash.netlify.app/">
+            Share It!
+          </Button>
         </MobileNav>
       </Container>
     </Header>
