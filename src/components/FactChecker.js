@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { startGetSearches, startAddSearch } from "../actions/searches";
 import { animated, useTrail, interpolate } from "react-spring";
 import background from "../images/bg-shorten-desktop.svg";
+import Pills from "./Pills";
 
 const Container = styled.div`
   max-width: 1200px;
@@ -16,7 +19,7 @@ const FactChecker = styled.div`
   background-size: cover;
   padding: 1.5rem;
   border-radius: 0.5rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   @media (min-width: 768px) {
     padding: 3rem;
   }
@@ -76,7 +79,6 @@ const SubmitButton = styled.button`
 `;
 
 const ResultsList = styled(animated.div)`
-  margin: 2rem 0;
   overflow: hidden;
 `;
 
@@ -86,6 +88,12 @@ ResultsList.Item = styled(animated.div)`
   margin-bottom: 2rem;
   border-radius: 0.5rem;
   background: white;
+  &:first-of-type {
+    margin-top: 2rem;
+  }
+  &:last-of-type {
+    margin-bottom: 2rem;
+  }
   @media (min-width: 768px) {
     flex-direction: row;
     align-items: center;
@@ -142,6 +150,7 @@ const Error = styled.p`
 `;
 
 export default () => {
+  const dispatch = useDispatch();
   const [rumors, setRumors] = useState({ claims: [] });
   const [query, setQuery] = useState("");
   const [hasErrors, setHasErrors] = useState(false);
@@ -168,7 +177,10 @@ export default () => {
       }
     };
     getRumors();
+    const search = { query };
+    dispatch(startAddSearch(search));
   };
+
   const handleCopy = async (e) => {
     const link = e.target.previousElementSibling.dataset.url;
     e.target.innerText = "Copied!";
@@ -179,6 +191,11 @@ export default () => {
       console.error("Failed to copy!", err);
     }
   };
+
+  useEffect(() => {
+    dispatch(startGetSearches());
+  }, [dispatch]);
+
   return (
     <Container>
       <FactChecker id="debunker">
@@ -204,7 +221,7 @@ export default () => {
           </SubmitButton>
         </FactChecker.Form>
       </FactChecker>
-      <h3>{rumors.claims.length ? `Showing results for ${query} ` : null}</h3>
+      <Pills setQuery={setQuery} />
       <ResultsList>
         {trail.map(({ x, ...props }, index) => (
           <ResultsList.Item
